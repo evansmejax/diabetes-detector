@@ -17,11 +17,11 @@ This Program Detects if someone has diabetes using Python Machine Learning..
 
 # open and display an image
 
-image = Image.open('C:/Users/chil/Downloads/011.jpg')
+image = Image.open('assets/011.jpg')
 
 #st.image(image, caption='ML',use_column_width=True)
 
-df = pd.read_csv('C:/Users/chil/Desktop/DiabetesDetection/detector/data.csv')
+df = pd.read_csv('assets/data.csv')
 
 st.subheader("Data Information:")
 
