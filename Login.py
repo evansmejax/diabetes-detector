@@ -1,11 +1,12 @@
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-
+from streamlit import caching
 from PIL import Image
+
+
 import streamlit as st 
 import pandas as pd
-
 import sqlite3
 
 conn = sqlite3.connect('data.db')
@@ -64,20 +65,24 @@ def get_user_input():
 
 def main(): 
     st.title("DIABETES DETECTOR APP") 
-    menu = ["Home","Login","SignUp"]
+    menu = ["Home","Login","SignUp","Logout"]
     choice = st.sidebar.selectbox("Menu",menu) 
     if choice == "Home":
         st.subheader("Home") 
+    if choice == "Logout":
+        caching.clear_cache()
+        st.warning("You have Logged out")
+         
     if choice == "Login":
         username = st.sidebar.text_input("User Name")
         password = st.sidebar.text_input("Password",type='password')
         if st.sidebar.checkbox("Login"): 
-            #if == password '12315':
             create_usertable()
             result = login_user(username,password)
             if result:
                 st.success("Logged In as {}".format(username)) 
-                task = st.selectbox("Select a Task",["Dashboard","Analytics","Edit Profile"]) 
+                task = st.selectbox("Select a Task",["Dashboard","Analytics","Edit Profile"])
+
                 if task == "Dashboard":
                     st.subheader("Welcome to Automated Diabetes Detection System") 
                     # Cover Image
@@ -98,17 +103,16 @@ def main():
                     st.write(user_input)
 
                     #Create '7. 'lie model " 
-                    RandomForestClassifier = RandomForestClassifier() 
-                    RandomForestClassifier.fit(X_train, Y_train) 
+                    MyRandomForestClassifierObj = RandomForestClassifier() 
+                    MyRandomForestClassifierObj.fit(X_train, Y_train) 
 
                     #Show the models metrics 
 
                     st.subheader('Model Test Accuracy Score:') 
-                    st.write(str(accuracy_score(Y_test, RandomForestClassifier.predict(X_test)) * 100)+'%')
-
+                    st.write(str(accuracy_score(Y_test, MyRandomForestClassifierObj.predict(X_test)) * 100)+'%')
 
                     #Store the  models predictions in  a variable 
-                    prediction = RandomForestClassifier.predict(user_input) 
+                    prediction = MyRandomForestClassifierObj.predict(user_input) 
 
                     #Setasubheaderand display the classification 
 
