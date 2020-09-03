@@ -26,8 +26,8 @@ def login_user(username,password):
     data = c.fetchall()
     return data
 
-def view_all_users(username,password):
-    c.execute('SELECT * FROM userstable',(username,password))
+def view_all_users():
+    c.execute('SELECT * FROM userstable')
     data = c.fetchall()
     return data
 
@@ -81,7 +81,7 @@ def main():
             result = login_user(username,password)
             if result:
                 st.success("Logged In as {}".format(username)) 
-                task = st.selectbox("Select a Task",["Dashboard","Analytics","Edit Profile"])
+                task = st.selectbox("Select a Task",["Dashboard","Analytics","All Users"])
 
                 if task == "Dashboard":
                     st.subheader("Welcome to Automated Diabetes Detection System") 
@@ -91,7 +91,7 @@ def main():
                 elif task == "Analytics":
                     st.subheader("Diabetes Analytics")
                     df = pd.read_csv('assets/data.csv')
-                    st.subheader("Data Information:")
+                    st.subheader("Training Data Information:")
                     st.dataframe(df) 
                     st.write(df.describe()) 
                     chart = st.bar_chart(df) 
@@ -102,27 +102,27 @@ def main():
                     st.subheader('User Input:')
                     st.write(user_input)
 
-                    #Create '7. 'lie model " 
+                    #Create model 
                     MyRandomForestClassifierObj = RandomForestClassifier() 
                     MyRandomForestClassifierObj.fit(X_train, Y_train) 
 
-                    #Show the models metrics 
+                    # Show the models metrics 
 
                     st.subheader('Model Test Accuracy Score:') 
                     st.write(str(accuracy_score(Y_test, MyRandomForestClassifierObj.predict(X_test)) * 100)+'%')
 
-                    #Store the  models predictions in  a variable 
+                    # Store the  models predictions in  a variable 
                     prediction = MyRandomForestClassifierObj.predict(user_input) 
 
-                    #Setasubheaderand display the classification 
+                    #Set a subheaderand display the classification 
 
                     st.subheader('Classification: ') 
                     st.write(prediction)
 
 
-                elif task == "Edit Profile":
-                    st.subheader("Your Profile")
-                    user_result = view_all_users(username,password)
+                elif task == "All Users":
+                    st.subheader("All Users")
+                    user_result = view_all_users()
                     clean_db = pd.DataFrame(user_result,columns=['Username','Password'])
                     st.dataframe(clean_db)
             else:
