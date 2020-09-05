@@ -5,10 +5,21 @@ from streamlit import caching
 from PIL import Image
 import streamlit as st 
 import pandas as pd
-import sqlite3
+import sqlite3,csv
+
 
 conn = sqlite3.connect('data.db')
 c = conn.cursor()
+
+# csv_file = 'assets/data.csv'
+# c.execute("CREATE TABLE IF NOT EXISTS table_csv (Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Age,Outcome);") # use your column names here
+# with open(csv_file,'r') as fin: 
+#     dr = csv.DictReader(fin)
+#     to_db = [(i['Pregnancies'], i['Glucose'], i['BloodPressure'], i['SkinThickness'], i['Insulin'], i['BMI'], i['DiabetesPedigreeFunction'], i['Age'], i['Outcome']) for i in dr]
+# c.executemany("INSERT INTO table_csv (Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,BMI,DiabetesPedigreeFunction,Age,Outcome) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);", to_db)
+# conn.commit()
+
+
 # DB Management sqlite3 
 def create_userauth():
     c.execute('CREATE TABLE IF NOT EXISTS auth_user(username TEXT,password TEXT)') 
@@ -117,7 +128,7 @@ def main():
     #st.title("DIABETES DETECTOR APP") 
     if is_authenticated():
         print("some one is authenticated")
-        auth_menu = ["Dashboard","Analytics","Profile","Users","Logout"]
+        auth_menu = ["Dashboard","Analytics","Profile","Logout"]
         choice = st.sidebar.selectbox("Select A Task",auth_menu)
         if choice == "Profile":
             profile_menu = ["View Profile","Edit Profile"]
@@ -143,17 +154,14 @@ def main():
                 password = st.text_input("Password : ", old_password)
                 if st.button("Update Profile"):
                     update_user_profile(fullname,email,country,phone,password,old_email,old_password)
-        if choice == "Users":
-            st.subheader("All Users")
-            user_result = view_all_users()
-            clean_db = pd.DataFrame(user_result,columns=['Fullname','Email','Country','Mobile','Password','Security_key'])
-            st.dataframe(clean_db)
         if choice == "Logout":
             logout_user()
             st.warning("You have just logged out. Please reload the page and login/signup from menu")
         if choice == "Analytics":
             #st.subheader("Diabetes Analytics")
-            df = pd.read_csv('assets/data.csv')
+            #df = pd.read_csv('assets/data.csv')
+            df = pd.read_sql("select * from table_csv", con=conn)
+            print(df)
             st.subheader("Training Data Information:")
             st.dataframe(df) 
             st.write(df.describe()) 
